@@ -2,17 +2,18 @@ package com.example.newzz.screens
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.newzz.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.FragmentTopNewsBinding
+import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.repository.NewsRepository
 import com.example.newzz.util.Resource
 import com.example.newzz.viewmodel.NewsViewModel
@@ -22,6 +23,8 @@ class TopNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentTopNewsBinding
     private lateinit var newsViewModel: NewsViewModel
+    private lateinit var newsAdapter: NewsAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,10 +34,11 @@ class TopNewsFragment : Fragment() {
         binding.lifecycleOwner = this
 
         val api = NewsAPI()
-        val repository = NewsRepository(api)
+        val articleDAO = ArticleDatabase.invoke(requireContext()).getArticleDao()
+        val repository = NewsRepository(api, articleDAO)
         val newsViewModelFactory = NewsViewModelFactory(repository)
-        newsViewModel = ViewModelProvider(this, newsViewModelFactory)[NewsViewModel::class.java]
-
+        newsViewModel =
+            ViewModelProvider(requireActivity(), newsViewModelFactory)[NewsViewModel::class.java]
         binding.topNews = newsViewModel
 
         return binding.root
@@ -43,25 +47,34 @@ class TopNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        newsAdapter = NewsAdapter()
+        binding.rvTopNews.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = newsAdapter
+            setHasFixedSize(true)
+        }
+
+        newsViewModel.topArticles.observe(viewLifecycleOwner, Observer { articles ->
+            Log.d("TopNewsFragment", "Articles received: ${articles.size}")
+            newsAdapter.submitList(articles)
+        })
+
         newsViewModel.topNews.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
                 is Resource.Loading -> {
-                    Log.d("NewsFragment", "Loading data...")
+                    Log.d("TopNewsFragment", "Loading data...")
                 }
 
                 is Resource.Success -> {
-                    binding.top.text = state.data.toString()
-                    Log.d("NewsFragment", "News loaded successfully")
+                    binding.top.visibility = View.INVISIBLE
+                    Log.d("TopNewsFragment", "News loaded successfully")
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(activity, "Error Occurred!!", Toast.LENGTH_LONG).show()
-                    Log.e("NewsFragment", "Error: ${state.message}")
+                    Toast.makeText(activity, "Error Occurred!!", Toast.LENGTH_SHORT).show()
+                    Log.e("TopNewsFragment", "Error: ${state.message}")
                 }
             }
         })
-
-        newsViewModel.refreshTopNews()
-
     }
 }

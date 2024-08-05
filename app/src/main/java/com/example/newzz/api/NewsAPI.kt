@@ -19,8 +19,8 @@ interface NewsAPI {
         page: Int = 1,
         @Query("apiKey")
         apiKey: String = API_KEY,
-        @Query("sortBy")
-        sortBy: String = "publishedAt"
+        @Query("pageSize")
+        pageSize: Int = 100
     ): Response<NewsResponse>
 
     @GET("v2/everything")
@@ -31,8 +31,8 @@ interface NewsAPI {
         page: Int = 1,
         @Query("apiKey")
         apiKey: String = API_KEY,
-        @Query("sortBy")
-        sortBy: String = "publishedAt"
+        @Query("language")
+        language: String = "en"
     ): Response<NewsResponse>
 
     companion object {
