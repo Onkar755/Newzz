@@ -48,6 +48,31 @@
         android:id="@+id/newsArticleFragment"
         android:name="com.example.newzz.screens.NewsArticleFragment"
         android:label="@string/article"
-        tools:layout="@layout/fragment_news_article" />
+        tools:layout="@layout/fragment_news_article" >
+        <argument
+            android:name="Article"
+            app:argType="com.example.newzz.model.Article" />
+        <action
+            android:id="@+id/action_newsArticleFragment_to_searchNewsFragment"
+            app:destination="@id/searchNewsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_newsArticleFragment_to_savedNewsFragment"
+            app:destination="@id/savedNewsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_newsArticleFragment_to_topNewsFragment"
+            app:destination="@id/topNewsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
 </navigation>

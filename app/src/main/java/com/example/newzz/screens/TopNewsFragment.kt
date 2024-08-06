@@ -9,17 +9,20 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.adapter.NewsAdapter
+import com.example.newzz.adapter.OnItemClickListener
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.FragmentTopNewsBinding
 import com.example.newzz.db.ArticleDatabase
+import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
 import com.example.newzz.util.Resource
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 
-class TopNewsFragment : Fragment() {
+class TopNewsFragment : Fragment(), OnItemClickListener {
 
     private lateinit var binding: FragmentTopNewsBinding
     private lateinit var newsViewModel: NewsViewModel
@@ -47,7 +50,7 @@ class TopNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.rvTopNews.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = newsAdapter
@@ -66,7 +69,7 @@ class TopNewsFragment : Fragment() {
                 }
 
                 is Resource.Success -> {
-                    binding.top.visibility = View.INVISIBLE
+                    binding.srlTop.isRefreshing = false
                     Log.d("TopNewsFragment", "News loaded successfully")
                 }
 
@@ -76,5 +79,19 @@ class TopNewsFragment : Fragment() {
                 }
             }
         })
+
+        binding.srlTop.setOnRefreshListener {
+            newsViewModel.refreshTopNews()
+        }
+    }
+
+    override fun onItemClick(article: Article) {
+        val source = article.source
+        if (source!!.id.isEmpty()) {
+            Log.e("Error", "Article source ID is null or empty. Setting a default value.")
+            article.source = source.copy(id = "default_id")
+        }
+        val action = TopNewsFragmentDirections.actionTopNewsFragmentToNewsArticleFragment(article)
+        findNavController().navigate(action)
     }
 }

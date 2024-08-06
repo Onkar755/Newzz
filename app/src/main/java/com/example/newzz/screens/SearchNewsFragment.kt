@@ -11,11 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.adapter.NewsAdapter
+import com.example.newzz.adapter.OnItemClickListener
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.FragmentSearchNewsBinding
 import com.example.newzz.db.ArticleDatabase
+import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
 import com.example.newzz.util.Resource
 import com.example.newzz.viewmodel.NewsViewModel
@@ -24,13 +27,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SearchNewsFragment : Fragment() {
+class SearchNewsFragment : Fragment(), OnItemClickListener {
 
     private lateinit var binding: FragmentSearchNewsBinding
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var newsViewModel: NewsViewModel
     private var searchJob: Job? = null
-    private val debouncePeriod: Long = 1000
+    private val debouncePeriod: Long = 500
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +56,7 @@ class SearchNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.rvSearchNews.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = newsAdapter
@@ -102,9 +105,21 @@ class SearchNewsFragment : Fragment() {
 //                        newsViewModel.getSearches(query)
 //                    }
 //                }
-                return true
+                return false
             }
         })
+    }
+
+    override fun onItemClick(article: Article) {
+        val source = article.source
+        if (source!!.id.isEmpty()) {
+            Log.e("Error", "Article source ID is null or empty. Setting a default value.")
+            article.source = source.copy(id = "default_id")
+        }
+
+        val action =
+            SearchNewsFragmentDirections.actionSearchNewsFragmentToNewsArticleFragment(article)
+        findNavController().navigate(action)
     }
 
 

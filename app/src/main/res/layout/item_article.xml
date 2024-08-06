@@ -9,12 +9,16 @@
         <variable
             name="newsItem"
             type="com.example.newzz.model.Article" />
+        <variable
+            name="clickListener"
+            type="com.example.newzz.adapter.OnItemClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:layout_margin="8dp"
+        android:onClick="@{() -> clickListener.onItemClick(newsItem)}">
 
         <ImageView
             android:id="@+id/ivArticleImage"

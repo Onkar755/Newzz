@@ -11,12 +11,14 @@ class NewsRepository(
     private val api: NewsAPI,
     private val articleDAO: ArticleDAO
 ) {
+
     suspend fun refreshTopNews(): Resource<List<Article>> {
         return try {
             val response = api.getTopNews()
             if (response.isSuccessful) {
                 val articles = response.body()?.articles?.filterNotNull()
                 if (!articles.isNullOrEmpty()) {
+                    articleDAO.deleteArticlesByCategory("top")
                     Resource.Success(articles)
                 } else {
                     Resource.Error("No data found")
@@ -34,8 +36,10 @@ class NewsRepository(
         return try {
             val response = api.getSearchedNews(query)
             if (response.isSuccessful) {
+
                 val articles = response.body()?.articles?.filterNotNull()
                 if (!articles.isNullOrEmpty()) {
+                    articleDAO.deleteArticlesByCategory("searched")
                     Resource.Success(articles)
                 } else {
                     Resource.Error("No data found")

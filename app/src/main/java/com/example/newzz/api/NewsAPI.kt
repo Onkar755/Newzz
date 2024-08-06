@@ -20,7 +20,9 @@ interface NewsAPI {
         @Query("apiKey")
         apiKey: String = API_KEY,
         @Query("pageSize")
-        pageSize: Int = 100
+        pageSize: Int = 100,
+        @Query("language")
+        language: String = "en"
     ): Response<NewsResponse>
 
     @GET("v2/everything")

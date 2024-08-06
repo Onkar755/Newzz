@@ -9,7 +9,8 @@ import com.example.newzz.R
 import com.example.newzz.databinding.ItemArticleBinding
 import com.example.newzz.model.Article
 
-class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(DiffUtil) {
+class NewsAdapter(private val listener: OnItemClickListener) :
+    ListAdapter<Article, NewsAdapter.NewsViewHolder>(DiffUtil) {
 
     inner class NewsViewHolder(
         val binding: ItemArticleBinding
@@ -38,7 +39,11 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(DiffUtil) {
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val article: Article? = getItem(position)
         holder.binding.newsItem = article
-
+        holder.binding.clickListener = listener
         holder.binding.executePendingBindings()
     }
+}
+
+interface OnItemClickListener {
+    fun onItemClick(article: Article)
 }
