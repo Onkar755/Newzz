@@ -6,11 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.adapter.NewsAdapter
@@ -20,12 +18,9 @@ import com.example.newzz.databinding.FragmentSearchNewsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
-import com.example.newzz.util.Resource
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class SearchNewsFragment : Fragment(), OnItemClickListener {
 
@@ -38,7 +33,7 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSearchNewsBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
@@ -63,26 +58,11 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
             setHasFixedSize(true)
         }
 
-        newsViewModel.searchedArticles.observe(viewLifecycleOwner, Observer { articles ->
-            Log.d("SearchNewsFragment", "Articles received: ${articles.size}")
-            newsAdapter.submitList(articles)
-        })
-
-        newsViewModel.searchedNews.observe(viewLifecycleOwner, Observer { state ->
-            when (state) {
-                is Resource.Loading -> {
-                    Log.d("SearchNewsFragment", "Loading data...")
-                }
-
-                is Resource.Success -> {
-                    binding.searchResult.visibility = View.INVISIBLE
-                    Log.d("SearchNewsFragment", "News loaded successfully")
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(activity, "Error Occurred!!", Toast.LENGTH_SHORT).show()
-                    Log.e("SearchNewsFragment", "Error: ${state.message}")
-                }
+        newsViewModel.searchedNews.observe(viewLifecycleOwner, Observer { articles ->
+            Log.d("SearchNewsFragment", "Articles received: $articles")
+            articles?.let {
+                Log.d("SearchNewsFragment", "Articles receiveddddd: $it")
+                newsAdapter.submitData(lifecycle, it)
             }
         })
 
@@ -112,9 +92,11 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(article: Article) {
         val source = article.source
-        if (source!!.id.isEmpty()) {
-            Log.e("Error", "Article source ID is null or empty. Setting a default value.")
-            article.source = source.copy(id = "default_id")
+        if (source != null) {
+            if (source.id.isNullOrEmpty()) {
+                Log.e("Error", "Article source ID is null or empty. Setting a default value.")
+                article.source = source.copy(id = "default_id")
+            }
         }
 
         val action =

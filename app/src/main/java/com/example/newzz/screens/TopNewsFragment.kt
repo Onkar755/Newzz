@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +17,6 @@ import com.example.newzz.databinding.FragmentTopNewsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
-import com.example.newzz.util.Resource
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 
@@ -32,7 +30,7 @@ class TopNewsFragment : Fragment(), OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentTopNewsBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
@@ -57,26 +55,11 @@ class TopNewsFragment : Fragment(), OnItemClickListener {
             setHasFixedSize(true)
         }
 
-        newsViewModel.topArticles.observe(viewLifecycleOwner, Observer { articles ->
-            Log.d("TopNewsFragment", "Articles received: ${articles.size}")
-            newsAdapter.submitList(articles)
-        })
-
-        newsViewModel.topNews.observe(viewLifecycleOwner, Observer { state ->
-            when (state) {
-                is Resource.Loading -> {
-                    Log.d("TopNewsFragment", "Loading data...")
-                }
-
-                is Resource.Success -> {
-                    binding.srlTop.isRefreshing = false
-                    Log.d("TopNewsFragment", "News loaded successfully")
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(activity, "Error Occurred!!", Toast.LENGTH_SHORT).show()
-                    Log.e("TopNewsFragment", "Error: ${state.message}")
-                }
+        newsViewModel.topNews.observe(viewLifecycleOwner, Observer { articles ->
+            Log.d("TopNewsFragment", "Articles received: $articles")
+            articles?.let {
+                binding.srlTop.isRefreshing = false
+                newsAdapter.submitData(lifecycle, it)
             }
         })
 
@@ -87,9 +70,11 @@ class TopNewsFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(article: Article) {
         val source = article.source
-        if (source!!.id.isEmpty()) {
-            Log.e("Error", "Article source ID is null or empty. Setting a default value.")
-            article.source = source.copy(id = "default_id")
+        if (source != null) {
+            if (source.id.isNullOrEmpty()) {
+                Log.e("Error", "Article source ID is null or empty. Setting a default value.")
+                article.source = source.copy(id = "default_id")
+            }
         }
         val action = TopNewsFragmentDirections.actionTopNewsFragmentToNewsArticleFragment(article)
         findNavController().navigate(action)

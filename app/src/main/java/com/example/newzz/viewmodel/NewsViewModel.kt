@@ -4,22 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
-import com.example.newzz.util.Resource
 import kotlinx.coroutines.launch
 
 class NewsViewModel(
-    private val repository: NewsRepository,
+    private val repository: NewsRepository
 ) : ViewModel() {
 
     // LiveData for top news
-    private val _topNews = MutableLiveData<Resource<List<Article>>>()
-    val topNews: LiveData<Resource<List<Article>>> = _topNews
+    private val _topNews = MutableLiveData<PagingData<Article>>()
+    val topNews: LiveData<PagingData<Article>> = _topNews.cachedIn(viewModelScope)
 
     // LiveData for searched news
-    private val _searchedNews = MutableLiveData<Resource<List<Article>>>()
-    val searchedNews: LiveData<Resource<List<Article>>> = _searchedNews
+    private val _searchedNews = MutableLiveData<PagingData<Article>>()
+    val searchedNews: LiveData<PagingData<Article>> = _searchedNews.cachedIn(viewModelScope)
 
     init {
         refreshTopNews()
@@ -30,20 +31,18 @@ class NewsViewModel(
     val searchedArticles: LiveData<List<Article>> = repository.getSearchedArticles()
 
     fun refreshTopNews() {
-        _topNews.value = Resource.Loading()
         viewModelScope.launch {
-            val response = repository.refreshTopNews()
-            response.data?.let { insertArticles(it, "top") }
-            _topNews.value = response
+            repository.getTopNews().collect { pagingData ->
+                _topNews.postValue(pagingData)
+            }
         }
     }
 
     fun getSearches(query: String) {
-        _searchedNews.value = Resource.Loading()
         viewModelScope.launch {
-            val response = repository.getSearches(query)
-            response.data?.let { insertArticles(it, "searched") }
-            _searchedNews.value = response
+            repository.getSearches(query).collect { pagingData ->
+                _searchedNews.postValue(pagingData)
+            }
         }
     }
 
@@ -64,4 +63,5 @@ class NewsViewModel(
             repository.insertArticles(articles, category)
         }
     }
+
 }

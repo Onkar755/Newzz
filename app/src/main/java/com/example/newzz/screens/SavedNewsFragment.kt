@@ -29,7 +29,7 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSavedNewsBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
@@ -53,11 +53,11 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
             adapter = newsAdapter
             setHasFixedSize(true)
         }
-
-        newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->
-            Log.d("SavedNewsFragment", "Articles received: ${articles.size}")
-            newsAdapter.submitList(articles)
-        })
+//
+//        newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->
+//            Log.d("SavedNewsFragment", "Articles received: ${articles.size}")
+//            newsAdapter.submitList(articles)
+//        })
     }
 
     override fun onItemClick(article: Article) {

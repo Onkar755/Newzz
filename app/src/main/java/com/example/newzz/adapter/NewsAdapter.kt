@@ -3,6 +3,7 @@ package com.example.newzz.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newzz.R
@@ -10,7 +11,7 @@ import com.example.newzz.databinding.ItemArticleBinding
 import com.example.newzz.model.Article
 
 class NewsAdapter(private val listener: OnItemClickListener) :
-    ListAdapter<Article, NewsAdapter.NewsViewHolder>(DiffUtil) {
+    PagingDataAdapter<Article, NewsAdapter.NewsViewHolder>(DiffUtil) {
 
     inner class NewsViewHolder(
         val binding: ItemArticleBinding

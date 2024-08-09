@@ -20,5 +20,5 @@ data class Article(
     val url: String?,
     val urlToImage: String?,
     val isSaved: Boolean = false,
-    val category: String
+    val category: String?
 ) : Parcelable
