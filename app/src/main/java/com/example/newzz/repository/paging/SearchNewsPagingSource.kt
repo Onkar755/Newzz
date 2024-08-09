@@ -21,19 +21,35 @@ class SearchNewsPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         val page = params.key ?: 1
+        if (page == 1) {
+            articleDAO.deleteArticlesByCategory("searched")
+        }
         return try {
-           if (page == 1) {
-               articleDAO.deleteArticlesByCategory("searched")
-           }
             val response = api.getSearchedNews(query, page)
             val articles = response.body()?.articles?.filterNotNull() ?: emptyList()
-            Log.d("SearchNewsPagingSource", "Paged $page !! Articles received: ${articles.size}")
 
-            val categorizedArticles = articles.map { it.copy(category = "searched") }
-            articleDAO.insertArticles(categorizedArticles)
+            val urlsToExclude = setOf("https://removed.com")
+
+            val filteredArticles = articles.filter { article ->
+                !urlsToExclude.contains(article.url)
+            }
+
+            Log.d("TopNewsPagingSource", "Fetched $page articles: ${articles.size}")
+
+            val categorizedArticles = filteredArticles.map { it.copy(category = "searched") }
+
+            val savedArticles = articleDAO.getSavedArticlesByCategorySync("searched")
+            val savedArticlesMap = savedArticles.associateBy { it.url }
+
+            val updatedArticles = categorizedArticles.map {
+                it.copy(isSaved = savedArticlesMap[it.url]?.isSaved ?: false)
+            }
+
+            articleDAO.insertArticles(updatedArticles)
+            Log.d("TopNewsPagingSource", "Inserted articles into DB: ${updatedArticles.size}")
 
             LoadResult.Page(
-                data = articles,
+                data = updatedArticles,
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = if (articles.isEmpty()) null else page + 1
             )

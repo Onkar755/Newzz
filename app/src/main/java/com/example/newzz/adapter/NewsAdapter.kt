@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newzz.R
 import com.example.newzz.databinding.ItemArticleBinding
@@ -41,10 +40,20 @@ class NewsAdapter(private val listener: OnItemClickListener) :
         val article: Article? = getItem(position)
         holder.binding.newsItem = article
         holder.binding.clickListener = listener
+
+        holder.binding.saveButton.apply {
+            setOnClickListener {
+                if (article != null) {
+                    listener.onSaveStateClick(article)
+                }
+            }
+        }
+
         holder.binding.executePendingBindings()
     }
 }
 
 interface OnItemClickListener {
     fun onItemClick(article: Article)
+    fun onSaveStateClick(article: Article)
 }

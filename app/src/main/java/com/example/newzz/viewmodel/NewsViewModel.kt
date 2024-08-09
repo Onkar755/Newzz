@@ -1,5 +1,6 @@
 package com.example.newzz.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,15 +47,10 @@ class NewsViewModel(
         }
     }
 
-    fun saveArticle(article: Article) {
+    fun saveStateChange(article: Article) {
         viewModelScope.launch {
-            repository.saveArticle(article)
-        }
-    }
-
-    fun unSaveArticle(article: Article) {
-        viewModelScope.launch {
-            repository.unSaveArticle(article)
+            Log.d("NewsViewModel", "Called Repo-> saveArticle")
+            repository.saveStateChange(article)
         }
     }
 

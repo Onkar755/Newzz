@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.adapter.OnItemClickListener
@@ -53,11 +54,16 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
             adapter = newsAdapter
             setHasFixedSize(true)
         }
-//
-//        newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->
-//            Log.d("SavedNewsFragment", "Articles received: ${articles.size}")
-//            newsAdapter.submitList(articles)
-//        })
+
+        newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->
+            Log.d("SavedNewsFragment", "Articles received: ${articles.size}")
+            newsAdapter.submitData(lifecycle, PagingData.from(articles))
+        })
+    }
+
+    override fun onSaveStateClick(article: Article) {
+        Log.d("SavedNewsFragment", "Called -> saveArticle")
+        newsViewModel.saveStateChange(article)
     }
 
     override fun onItemClick(article: Article) {
@@ -71,5 +77,4 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
         findNavController().navigate(action)
 
     }
-
 }

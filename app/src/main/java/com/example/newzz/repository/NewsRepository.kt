@@ -37,14 +37,9 @@ class NewsRepository(
 
     fun getTopArticles(): LiveData<List<Article>> = articleDAO.getTopArticles()
 
-    suspend fun saveArticle(article: Article) {
-        val updatedArticle = article.copy(isSaved = true)
-        articleDAO.updateArticle(updatedArticle)
-    }
-
-    suspend fun unSaveArticle(article: Article) {
-        val updatedArticle = article.copy(isSaved = false)
-        articleDAO.updateArticle(updatedArticle)
+    suspend fun saveStateChange(article: Article) {
+        article.isSaved = true
+        articleDAO.updateArticle(article)
     }
 
     suspend fun insertArticles(articles: List<Article>, category: String) {

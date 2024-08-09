@@ -104,5 +104,7 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
         findNavController().navigate(action)
     }
 
-
+    override fun onSaveStateClick(article: Article) {
+        newsViewModel.saveStateChange(article)
+    }
 }

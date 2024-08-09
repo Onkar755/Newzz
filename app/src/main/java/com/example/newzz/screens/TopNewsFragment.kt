@@ -68,6 +68,11 @@ class TopNewsFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    override fun onSaveStateClick(article: Article) {
+        Log.d("TopNewsFragment", "Called -> saveArticle")
+        newsViewModel.saveStateChange(article)
+    }
+
     override fun onItemClick(article: Article) {
         val source = article.source
         if (source != null) {
