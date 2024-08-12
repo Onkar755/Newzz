@@ -15,7 +15,6 @@
             android:id="@+id/savedNewsFragment"
             android:icon="@drawable/bookmark_news_icon"
             android:title="@string/saved" />
-
     </group>
 
 </menu>

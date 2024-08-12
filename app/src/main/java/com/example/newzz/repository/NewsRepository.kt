@@ -1,6 +1,8 @@
 package com.example.newzz.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -15,6 +17,7 @@ class NewsRepository(
     private val api: NewsAPI,
     private val articleDAO: ArticleDAO
 ) {
+
     fun getTopNews(): Flow<PagingData<Article>> = Pager(
         config = PagingConfig(
             pageSize = 50,
@@ -38,7 +41,7 @@ class NewsRepository(
     fun getTopArticles(): LiveData<List<Article>> = articleDAO.getTopArticles()
 
     suspend fun saveStateChange(article: Article) {
-        article.isSaved = true
+        article.isSaved = !article.isSaved
         articleDAO.updateArticle(article)
     }
 
@@ -46,5 +49,4 @@ class NewsRepository(
         val categorizedArticles = articles.map { it.copy(category = category) }
         articleDAO.insertArticles(categorizedArticles)
     }
-
 }

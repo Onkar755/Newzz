@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newzz.R
+import com.example.newzz.adapter.LoaderAdapter
 import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.adapter.OnItemClickListener
 import com.example.newzz.api.NewsAPI
@@ -18,6 +20,7 @@ import com.example.newzz.databinding.FragmentSavedNewsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
+import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 
@@ -51,8 +54,15 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
         newsAdapter = NewsAdapter(this)
         binding.rvSavedNews.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = newsAdapter
+            adapter = newsAdapter.withLoadStateFooter(
+                footer = LoaderAdapter()
+            )
             setHasFixedSize(true)
+
+            val marginStart = resources.getDimensionPixelSize(R.dimen.divider_margin_start)
+            val marginEnd = resources.getDimensionPixelSize(R.dimen.divider_margin_end)
+
+            addItemDecoration(CustomDividerItemDecoration(requireContext(), marginStart, marginEnd))
         }
 
         newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->

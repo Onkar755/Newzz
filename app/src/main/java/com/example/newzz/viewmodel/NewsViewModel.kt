@@ -59,5 +59,4 @@ class NewsViewModel(
             repository.insertArticles(articles, category)
         }
     }
-
 }

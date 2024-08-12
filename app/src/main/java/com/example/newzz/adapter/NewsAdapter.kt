@@ -46,6 +46,7 @@ class NewsAdapter(private val listener: OnItemClickListener) :
                 if (article != null) {
                     listener.onSaveStateClick(article)
                 }
+                notifyItemChanged(position)
             }
         }
 
