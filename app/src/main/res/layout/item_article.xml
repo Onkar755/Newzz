@@ -106,7 +106,7 @@
                 android:contentDescription="TODO"
                 android:scaleType="centerCrop"
                 savedState="@{newsItem.saved}"
-                app:srcCompat="@drawable/bookmark_saved" />
+                app:srcCompat="@drawable/ic_save_selected" />
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

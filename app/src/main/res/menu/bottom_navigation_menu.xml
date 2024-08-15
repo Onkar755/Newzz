@@ -3,17 +3,17 @@
     <group>
         <item
             android:id="@+id/topNewsFragment"
-            android:icon="@drawable/top_news_icon"
-            android:title="@string/top" />
+            android:icon="@drawable/ic_home_selector"
+            android:title="@string/home" />
 
         <item
             android:id="@+id/searchNewsFragment"
-            android:icon="@drawable/search_news_icon"
-            android:title="@string/search" />
+            android:icon="@drawable/ic_explore_selector"
+            android:title="@string/discover" />
 
         <item
             android:id="@+id/savedNewsFragment"
-            android:icon="@drawable/bookmark_news_icon"
+            android:icon="@drawable/ic_save_selector"
             android:title="@string/saved" />
     </group>
 

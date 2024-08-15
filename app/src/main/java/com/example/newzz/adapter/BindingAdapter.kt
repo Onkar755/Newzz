@@ -19,6 +19,6 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
 @BindingAdapter("savedState")
 fun savedStateImage(imgView: ImageView, isSaved: Boolean) {
     imgView.setImageResource(
-        if (isSaved) R.drawable.bookmark_saved else R.drawable.bookmark_unsaved
+        if (isSaved) R.drawable.ic_save_selected else R.drawable.ic_save_unselected
     )
 }

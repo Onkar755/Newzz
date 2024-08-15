@@ -1,7 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Newzz" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+    <style name="Base.Theme.Newzz" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#4B7DDC</item>
+        <item name="colorPrimaryDark">#4B7DDC</item>
+        <item name="colorAccent">#4B7DDC</item>
+
+        <item name="android:windowBackground">#FFFFFF</item>
+
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
     </style>
 </resources>
