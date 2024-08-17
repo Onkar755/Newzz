@@ -23,13 +23,19 @@ class NewsViewModel(
     private val _searchedNews = MutableLiveData<PagingData<Article>>()
     val searchedNews: LiveData<PagingData<Article>> = _searchedNews.cachedIn(viewModelScope)
 
+    // LiveData for searched news
+    private val _popularNews = MutableLiveData<List<Article>>()
+    val popularNews: LiveData<List<Article>> = _popularNews
+
     init {
         refreshTopNews()
+        getPopularNews()
     }
 
     val savedArticles: LiveData<List<Article>> = repository.getSavedArticles()
     val topArticles: LiveData<List<Article>> = repository.getTopArticles()
     val searchedArticles: LiveData<List<Article>> = repository.getSearchedArticles()
+    val popularArticles: LiveData<List<Article>> = repository.getTodayPopularArticles()
 
     fun refreshTopNews() {
         viewModelScope.launch {
@@ -44,6 +50,15 @@ class NewsViewModel(
             repository.getSearches(query).collect { pagingData ->
                 _searchedNews.postValue(pagingData)
             }
+        }
+    }
+
+    fun getPopularNews() {
+        viewModelScope.launch {
+            Log.d("NewsViewModel", "Calling Repo -> getPopularNews")
+            val articles = repository.getPopularNews()
+            _popularNews.value = articles
+            Log.d("NewsViewModel", "Size - ${articles.size}")
         }
     }
 

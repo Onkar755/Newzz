@@ -2,7 +2,7 @@ package com.example.newzz.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -34,11 +34,35 @@ class NewsRepository(
         pagingSourceFactory = { SearchNewsPagingSource(query, api, articleDAO) }
     ).flow
 
+    suspend fun getPopularNews(): List<Article> {
+        Log.d("NewsRepository", "getPopularNews")
+        return try {
+            val response = api.getTodayPopularNews()
+            Log.d("NewsRepository", "Response: ${response.message()}")
+            if (response.isSuccessful) {
+                val articles = response.body()?.articles?.filterNotNull() ?: emptyList()
+                Log.d("NewsRepository", "Articles: ${articles.size}")
+                val categorizedArticles = articles.map { it.copy(category = "today_popular") }
+                articleDAO.deleteArticlesByCategory("today_popular")
+                articleDAO.insertArticles(categorizedArticles)
+                categorizedArticles
+            } else {
+                Log.e("NewsRepository", "Error: ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "Exception: ${e.message}")
+            emptyList()
+        }
+    }
+
     fun getSavedArticles(): LiveData<List<Article>> = articleDAO.getSavedArticles()
 
     fun getSearchedArticles(): LiveData<List<Article>> = articleDAO.getSearchedArticles()
 
     fun getTopArticles(): LiveData<List<Article>> = articleDAO.getTopArticles()
+
+    fun getTodayPopularArticles(): LiveData<List<Article>> = articleDAO.getTodayPopularArticles()
 
     suspend fun saveStateChange(article: Article) {
         article.isSaved = !article.isSaved

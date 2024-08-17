@@ -11,14 +11,18 @@ import retrofit2.http.Query
 
 interface NewsAPI {
 
-    @GET("v2/top-headlines")
+    @GET("/v2/everything")
     suspend fun getTopNews(
         @Query("page")
         page: Int = 1,
-        @Query("country")
-        countryCode: String = "in",
         @Query("apiKey")
-        apiKey: String = API_KEY
+        apiKey: String = API_KEY,
+        @Query("q")
+        q: String = "news",
+        @Query("language")
+        language: String = "en",
+        @Query("excludeDomains")
+        excludeDomains: String = "yahoo.com,removed.com,npr.org"
     ): Response<NewsResponse>
 
     @GET("v2/everything")
@@ -30,7 +34,27 @@ interface NewsAPI {
         @Query("apiKey")
         apiKey: String = API_KEY,
         @Query("language")
-        language: String = "en"
+        language: String = "en",
+        @Query("excludeDomains")
+        excludeDomains: String = "yahoo.com,removed.com"
+    ): Response<NewsResponse>
+
+    @GET("v2/everything")
+    suspend fun getTodayPopularNews(
+        @Query("page")
+        page: Int = 1,
+        @Query("apiKey")
+        apiKey: String = API_KEY,
+        @Query("pageSize")
+        pageSize: Int = 5,
+        @Query("domains")
+        domain: String = "bbc.co.uk,techcrunch.com",
+        @Query("language")
+        language: String = "en",
+        @Query("sortBy")
+        sortBy: String = "popularity",
+        @Query("excludeDomains")
+        excludeDomains: String = "yahoo.com,removed.com"
     ): Response<NewsResponse>
 
     companion object {
