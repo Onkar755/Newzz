@@ -36,7 +36,7 @@ interface NewsAPI {
         @Query("language")
         language: String = "en",
         @Query("excludeDomains")
-        excludeDomains: String = "yahoo.com,removed.com"
+        excludeDomains: String = "www.removed.com"
     ): Response<NewsResponse>
 
     @GET("v2/everything")

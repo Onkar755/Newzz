@@ -34,7 +34,7 @@ class SearchNewsPagingSource(
                 !urlsToExclude.contains(article.url)
             }
 
-            Log.d("TopNewsPagingSource", "Fetched $page articles: ${articles.size}")
+            Log.d("SearchNewsPagingSource", "Fetched $page articles: ${articles.size}")
 
             val categorizedArticles = filteredArticles.map { it.copy(category = "searched") }
 
@@ -46,7 +46,7 @@ class SearchNewsPagingSource(
             }
 
             articleDAO.insertArticles(updatedArticles)
-            Log.d("TopNewsPagingSource", "Inserted articles into DB: ${updatedArticles.size}")
+            Log.d("SearchNewsPagingSource", "Inserted articles into DB: ${updatedArticles.size}")
 
             LoadResult.Page(
                 data = updatedArticles,

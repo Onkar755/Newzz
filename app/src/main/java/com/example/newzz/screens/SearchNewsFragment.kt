@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +21,7 @@ import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
 import com.example.newzz.ui.CustomDividerItemDecoration
+import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 import kotlinx.coroutines.Job
@@ -43,9 +43,10 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
         binding = FragmentSearchNewsBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
+        val networkChecker = NetworkChecker(requireContext())
         val api = NewsAPI()
         val articleDAO = ArticleDatabase.invoke(requireContext()).getArticleDao()
-        val repository = NewsRepository(api, articleDAO)
+        val repository = NewsRepository(api, articleDAO, networkChecker)
         val newsViewModelFactory = NewsViewModelFactory(repository)
         newsViewModel =
             ViewModelProvider(requireActivity(), newsViewModelFactory)[NewsViewModel::class.java]

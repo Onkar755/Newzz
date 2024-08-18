@@ -17,23 +17,23 @@ interface ArticleDAO {
     @Query("DELETE FROM articles")
     suspend fun deleteAllArticles()
 
-    @Query("SELECT * FROM articles WHERE isSaved = 1")
-    fun getSavedArticles(): LiveData<List<Article>>
-
     @Query("SELECT * FROM articles WHERE category = :category")
     suspend fun getSavedArticlesByCategorySync(category: String): List<Article>
 
     @Update
     suspend fun updateArticle(article: Article)
 
-    @Query("SELECT * FROM articles WHERE category = 'top' OR category = 'today_popular'")
-    fun getTopArticles(): LiveData<List<Article>>
+    @Query("SELECT * FROM articles WHERE isSaved = 1")
+    fun getSavedArticles(): LiveData<List<Article>>
+
+    @Query("SELECT * FROM articles WHERE category = 'top'")
+    suspend fun getTopArticles(): List<Article>
 
     @Query("SELECT * FROM articles WHERE category = 'searched'")
-    fun getSearchedArticles(): LiveData<List<Article>>
+    suspend fun getSearchedArticles(): List<Article>
 
     @Query("SELECT * FROM articles WHERE category = 'today_popular'")
-    fun getTodayPopularArticles(): LiveData<List<Article>>
+    suspend fun getTodayPopularArticles(): List<Article>
 
     @Query("DELETE FROM articles WHERE isSaved = 0 AND category = :category")
     suspend fun deleteArticlesByCategory(category: String)
