@@ -11,32 +11,31 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.R
-import com.example.newzz.adapter.ExplorePagerAdapter
+import com.example.newzz.adapter.LoaderAdapter
+import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.adapter.NewsSliderAdapter
 import com.example.newzz.adapter.OnItemClickListener
-import com.example.newzz.adapter.ViewPagerParentNavigator
 import com.example.newzz.api.NewsAPI
-import com.example.newzz.databinding.FragmentHomeNewsBinding
+import com.example.newzz.databinding.FragmentTopNewsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
+import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
-import com.google.android.material.tabs.TabLayoutMediator
-import kotlin.properties.Delegates
 
-class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigator {
+class TopNewsFragment : Fragment(), OnItemClickListener {
 
-    private lateinit var binding: FragmentHomeNewsBinding
+    private lateinit var binding: FragmentTopNewsBinding
     private lateinit var newsViewModel: NewsViewModel
+    private lateinit var newsAdapter: NewsAdapter
     private lateinit var sliderAdapter: NewsSliderAdapter
-    private lateinit var explorePagerAdapter: ExplorePagerAdapter
 
-    private var isConnected by Delegates.notNull<Boolean>()
+    private var isConnected = false
     private val scrollDelay = 5000L
     private var handler: Handler? = null
     private var autoScrollRunnable: Runnable? = null
@@ -45,7 +44,7 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeNewsBinding.inflate(inflater)
+        binding = FragmentTopNewsBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
         val api = NewsAPI()
@@ -64,6 +63,28 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        newsAdapter = NewsAdapter(this)
+        binding.rvTopNews.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = newsAdapter.withLoadStateFooter(
+                footer = LoaderAdapter()
+            )
+            setHasFixedSize(true)
+
+            val marginStart = resources.getDimensionPixelSize(R.dimen.divider_margin_start)
+            val marginEnd = resources.getDimensionPixelSize(R.dimen.divider_margin_end)
+
+            addItemDecoration(CustomDividerItemDecoration(requireContext(), marginStart, marginEnd))
+        }
+
+        newsViewModel.topNews.observe(viewLifecycleOwner, Observer { articles ->
+            Log.d("TopNewsFragment", "Articles received: $articles")
+            articles?.let {
+                binding.srlTop.isRefreshing = false
+                newsAdapter.submitData(lifecycle, it)
+            }
+        })
+
         newsViewModel.popularNews.observe(viewLifecycleOwner, Observer { articles ->
             Log.d("TopNewsFragment", "Articles received 2: $articles")
             articles?.let {
@@ -72,26 +93,11 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
                 binding.vpPopularToday.currentItem = 0
                 stopAutoScroll()
                 startAutoScroll()
-                binding.srlTop.isRefreshing = false
             }
         })
 
-        explorePagerAdapter = ExplorePagerAdapter(this)
-        binding.explorer.viewPager.adapter = explorePagerAdapter
-
-        TabLayoutMediator(binding.explorer.tabLayout, binding.explorer.viewPager) { tab, position ->
-            Log.d("TopNewsFragment", "Mediator $position")
-            tab.text = when (position) {
-                0 -> "Trending"
-                1 -> "Technology"
-                2 -> "Sports"
-                3 -> "Entertainment"
-                4 -> "Politics"
-                else -> null
-            }
-        }.attach()
-
         binding.srlTop.setOnRefreshListener {
+            newsViewModel.refreshTopNews()
             newsViewModel.getPopularNews()
 
             binding.vpPopularToday.currentItem = 0
@@ -149,16 +155,10 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
                 }
             }
             val action =
-                HomeNewsFragmentDirections.actionHomeNewsFragmentToNewsArticleFragment(article)
+                TopNewsFragmentDirections.actionTopNewsFragmentToNewsArticleFragment(article)
             findNavController().navigate(action)
         } else {
             Toast.makeText(requireContext(), "Can't Open! No Internet", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun navigateFromPager(article: Article) {
-        val action =
-            HomeNewsFragmentDirections.actionHomeNewsFragmentToNewsArticleFragment(article)
-        findNavController().navigate(action)
     }
 }

@@ -22,7 +22,6 @@ import com.example.newzz.databinding.FragmentTrendingBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
-import com.example.newzz.screens.HomeNewsFragmentDirections
 import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel

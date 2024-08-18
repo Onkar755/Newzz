@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -17,6 +18,7 @@ import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.ActivityMainBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.repository.NewsRepository
+import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,9 +39,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val networkChecker = NetworkChecker(this)
         val api = NewsAPI()
         val articleDAO = ArticleDatabase.invoke(this).getArticleDao()
-        val repository = NewsRepository(api, articleDAO)
+        val repository = NewsRepository(api, articleDAO, networkChecker)
         val newsViewModelFactory = NewsViewModelFactory(repository)
         newsViewModel =
             ViewModelProvider(this, newsViewModelFactory)[NewsViewModel::class.java]

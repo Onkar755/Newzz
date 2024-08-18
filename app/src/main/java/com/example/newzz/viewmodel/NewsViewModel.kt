@@ -49,9 +49,6 @@ class NewsViewModel(
     }
 
     val savedArticles: LiveData<List<Article>> = repository.getSavedArticles()
-    val topArticles: LiveData<List<Article>> = repository.getTopArticles()
-    val searchedArticles: LiveData<List<Article>> = repository.getSearchedArticles()
-    val popularArticles: LiveData<List<Article>> = repository.getTodayPopularArticles()
 
     fun getNews(query: String, category: String) {
         viewModelScope.launch {
@@ -97,12 +94,6 @@ class NewsViewModel(
         viewModelScope.launch {
             Log.d("NewsViewModel", "Called Repo-> saveArticle")
             repository.saveStateChange(article)
-        }
-    }
-
-    private fun insertArticles(articles: List<Article>, category: String) {
-        viewModelScope.launch {
-            repository.insertArticles(articles, category)
         }
     }
 }

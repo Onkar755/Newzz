@@ -1,17 +1,20 @@
-package com.example.newzz.repository
+package com.example.newzz.repository.paging
 
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import androidx.room.Query
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.db.ArticleDAO
 import com.example.newzz.model.Article
+import com.example.newzz.util.ConnectivityObserver
+import com.example.newzz.util.NetworkChecker
+import kotlinx.coroutines.flow.first
 
-class SearchNewsPagingSource(
-    private val query: String,
-    private val category: String,
+class TopNewsPagingSource(
     private val api: NewsAPI,
     private val articleDAO: ArticleDAO,
+    private val networkChecker: NetworkChecker
 ) : PagingSource<Int, Article>() {
     override fun getRefreshKey(state: PagingState<Int, Article>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -22,11 +25,30 @@ class SearchNewsPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         val page = params.key ?: 1
-        if (page == 1) {
-            articleDAO.deleteArticlesByCategory(category)
-        }
+
+        val isConnected = networkChecker.isNetworkAvailable()
+        Log.d(
+            "TopNewsPagingSource",
+            "Connectivity status: ${if (isConnected) "Available" else "Not Available"}"
+        )
+
         return try {
-            val response = api.getSearchedNews(query, page)
+
+            if (!isConnected) {
+                val articles = articleDAO.getTopArticles()
+                Log.d("TopNewsPagingSource", "DB Article -> Fetched $page articles: ${articles.size}")
+                return LoadResult.Page(
+                    data = articles,
+                    prevKey = if (page == 1) null else page - 1,
+                    nextKey = if (articles.isEmpty()) null else page + 1
+                )
+            }
+
+            if (page == 1) {
+                articleDAO.deleteArticlesByCategory("top")
+            }
+
+            val response = api.getTopNews(page)
             val articles = response.body()?.articles?.filterNotNull() ?: emptyList()
 
             val urlsToExclude = setOf("https://removed.com")
@@ -35,11 +57,11 @@ class SearchNewsPagingSource(
                 !urlsToExclude.contains(article.url)
             }
 
-            Log.d("SearchNewsPagingSource", "Fetched $page articles: ${articles.size}")
+            Log.d("TopNewsPagingSource", "Fetched $page articles: ${articles.size}")
 
-            val categorizedArticles = filteredArticles.map { it.copy(category = category) }
+            val categorizedArticles = filteredArticles.map { it.copy(category = "top") }
 
-            val savedArticles = articleDAO.getSavedArticlesByCategorySync(category)
+            val savedArticles = articleDAO.getSavedArticlesByCategorySync("top")
             val savedArticlesMap = savedArticles.associateBy { it.url }
 
             val updatedArticles = categorizedArticles.map {
@@ -47,7 +69,7 @@ class SearchNewsPagingSource(
             }
 
             articleDAO.insertArticles(updatedArticles)
-            Log.d("SearchNewsPagingSource", "Inserted articles into DB: ${updatedArticles.size}")
+            Log.d("TopNewsPagingSource", "Inserted articles into DB: ${updatedArticles.size}")
 
             LoadResult.Page(
                 data = updatedArticles,
