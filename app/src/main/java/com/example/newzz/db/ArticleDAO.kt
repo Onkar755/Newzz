@@ -26,7 +26,7 @@ interface ArticleDAO {
     @Update
     suspend fun updateArticle(article: Article)
 
-    @Query("SELECT * FROM articles WHERE category = 'top' AND category = 'today_popular'")
+    @Query("SELECT * FROM articles WHERE category = 'top' OR category = 'today_popular'")
     fun getTopArticles(): LiveData<List<Article>>
 
     @Query("SELECT * FROM articles WHERE category = 'searched'")

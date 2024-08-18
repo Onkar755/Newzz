@@ -9,6 +9,7 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.R
@@ -24,6 +25,8 @@ import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchNewsFragment : Fragment(), OnItemClickListener {
 
@@ -76,7 +79,9 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
             }
         })
 
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+        binding.searchView.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
                     Log.d("SearchNewsFragment", "Call....")
@@ -87,14 +92,14 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-//                searchJob?.cancel()
-//                searchJob = lifecycleScope.launch {
-//                    newText?.let { query ->
-//                        delay(debouncePeriod)
-//                        Log.d("SearchNewsFragment", "Call....")
-//                        newsViewModel.getSearches(query)
-//                    }
-//                }
+                searchJob?.cancel()
+                searchJob = lifecycleScope.launch {
+                    newText?.let { query ->
+                        delay(debouncePeriod)
+                        Log.d("SearchNewsFragment", "Call....")
+                        newsViewModel.getSearches(query)
+                    }
+                }
                 return false
             }
         })

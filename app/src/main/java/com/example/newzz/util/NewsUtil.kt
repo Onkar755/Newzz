@@ -7,7 +7,7 @@ import android.util.Log
 
 class NewsUtil {
     companion object {
-        const val API_KEY = "3853370b0950446494c7e5a8b47bb3ea"
+        const val API_KEY = "2d264254eacd42bfac9b1d0419e1b8a2"
         const val BASE_URL = "https://newsapi.org"
     }
 }
