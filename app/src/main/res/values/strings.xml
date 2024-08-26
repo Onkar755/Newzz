@@ -10,4 +10,10 @@
     <string name="discover">Discover</string>
     <string name="saved">Saved</string>
     <string name="settings">Settings</string>
+
+
+    <string name="tab_trending">Trending</string>
+    <string name="tab_sports">Sports</string>
+    <string name="tab_entertainment">Entertainment</string>
+    <string name="tab_politics">Politics</string>
 </resources>

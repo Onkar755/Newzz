@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration =
             AppBarConfiguration(
                 setOf(
-                    R.id.topNewsFragment,
+                    R.id.homeNewsFragment,
                     R.id.searchNewsFragment,
                     R.id.savedNewsFragment
                 )
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.topNewsFragment,
+                R.id.homeNewsFragment,
                 R.id.searchNewsFragment,
                 R.id.savedNewsFragment -> {
                     // Show default toolbar
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                     bottomNavigationView.visibility = View.VISIBLE
 
                     when (destination.id) {
-                        R.id.topNewsFragment -> toolbarDefault.findViewById<TextView>(R.id.tvTitleTBM).text =
+                        R.id.homeNewsFragment -> toolbarDefault.findViewById<TextView>(R.id.tvTitleTBM).text =
                             "Newzz"
 
                         R.id.searchNewsFragment -> toolbarDefault.findViewById<TextView>(R.id.tvTitleTBM).text =

@@ -2,7 +2,6 @@ package com.example.newzz.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -26,8 +25,8 @@ interface ArticleDAO {
     @Query("SELECT * FROM articles WHERE isSaved = 1")
     fun getSavedArticles(): LiveData<List<Article>>
 
-    @Query("SELECT * FROM articles WHERE category = 'top'")
-    suspend fun getTopArticles(): List<Article>
+    @Query("SELECT * FROM articles WHERE category = 'trending'")
+    suspend fun getTrendingArticles(): List<Article>
 
     @Query("SELECT * FROM articles WHERE category = 'searched'")
     suspend fun getSearchedArticles(): List<Article>

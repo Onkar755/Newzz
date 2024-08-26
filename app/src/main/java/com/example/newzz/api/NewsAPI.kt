@@ -36,7 +36,7 @@ interface NewsAPI {
         @Query("language")
         language: String = "en",
         @Query("excludeDomains")
-        excludeDomains: String = "www.removed.com"
+        excludeDomains: String = "yahoo.com,removed.com,npr.org"
     ): Response<NewsResponse>
 
     @GET("v2/everything")
@@ -48,13 +48,13 @@ interface NewsAPI {
         @Query("pageSize")
         pageSize: Int = 5,
         @Query("domains")
-        domain: String = "bbc.co.uk,techcrunch.com",
+        domain: String = "bbc.co.uk, techcrunch.com",
         @Query("language")
         language: String = "en",
         @Query("sortBy")
         sortBy: String = "popularity",
         @Query("excludeDomains")
-        excludeDomains: String = "yahoo.com,removed.com"
+        excludeDomains: String = "yahoo.com,removed.com,npr.org"
     ): Response<NewsResponse>
 
     companion object {
