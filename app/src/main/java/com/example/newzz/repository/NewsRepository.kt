@@ -2,16 +2,12 @@ package com.example.newzz.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.db.ArticleDAO
 import com.example.newzz.model.Article
-import com.example.newzz.repository.paging.SearchNewsPagingSource
-import com.example.newzz.repository.paging.TopNewsPagingSource
-import com.example.newzz.util.ConnectivityObserver
 import com.example.newzz.util.NetworkChecker
 import kotlinx.coroutines.flow.Flow
 
@@ -20,23 +16,14 @@ class NewsRepository(
     private val articleDAO: ArticleDAO,
     private val networkChecker: NetworkChecker
 ) {
-
     val isConnected = networkChecker.isNetworkAvailable()
 
-    fun getTopNews(): Flow<PagingData<Article>> = Pager(
-        config = PagingConfig(
-            pageSize = 50,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory = { TopNewsPagingSource(api, articleDAO, networkChecker) }
-    ).flow
-
-    fun getSearches(query: String): Flow<PagingData<Article>> = Pager(
+    fun getSearches(query: String, category: String): Flow<PagingData<Article>> = Pager(
         config = PagingConfig(
             pageSize = 20,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { SearchNewsPagingSource(query, api, articleDAO) }
+        pagingSourceFactory = { SearchNewsPagingSource(query, category, api, articleDAO) }
     ).flow
 
     suspend fun getPopularNews(): List<Article> {
