@@ -1,16 +1,19 @@
 <resources>
     <string name="app_name">Newzz</string>
-<<<<<<< HEAD
-=======
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="saved_news">Saved News</string>
     <string name="top_news">Top News</string>
     <string name="search_news">Search News</string>
     <string name="article">Article</string>
-    <string name="top">Top</string>
-    <string name="search">Search</string>
+    <string name="home">Home</string>
+    <string name="discover">Discover</string>
     <string name="saved">Saved</string>
     <string name="settings">Settings</string>
->>>>>>> 7142e25 (Bug Fixes and New UI -> List Items)
+
+
+    <string name="tab_trending">Trending</string>
+    <string name="tab_sports">Sports</string>
+    <string name="tab_entertainment">Entertainment</string>
+    <string name="tab_politics">Politics</string>
 </resources>

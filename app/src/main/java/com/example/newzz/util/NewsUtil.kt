@@ -1,0 +1,8 @@
+package com.example.newzz.util
+
+class NewsUtil {
+    companion object {
+        const val API_KEY = "2d264254eacd42bfac9b1d0419e1b8a2"
+        const val BASE_URL = "https://newsapi.org"
+    }
+}

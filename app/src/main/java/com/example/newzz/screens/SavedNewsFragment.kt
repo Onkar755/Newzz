@@ -21,6 +21,7 @@ import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
 import com.example.newzz.ui.CustomDividerItemDecoration
+import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
 
@@ -39,7 +40,8 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
 
         val api = NewsAPI()
         val articleDAO = ArticleDatabase.invoke(requireContext()).getArticleDao()
-        val repository = NewsRepository(api, articleDAO)
+        val networkChecker = NetworkChecker(requireContext())
+        val repository = NewsRepository(api, articleDAO,networkChecker)
         val newsViewModelFactory = NewsViewModelFactory(repository)
         newsViewModel =
             ViewModelProvider(requireActivity(), newsViewModelFactory)[NewsViewModel::class.java]
@@ -78,9 +80,11 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(article: Article) {
         val source = article.source
-        if (source!!.id.isEmpty()) {
-            Log.e("Error", "Article source ID is null or empty. Setting a default value.")
-            article.source = source.copy(id = "default_id")
+        if (source != null) {
+            if (source.id.isNullOrEmpty()) {
+                Log.e("Error", "Article source ID is null or empty. Setting a default value.")
+                article.source = source.copy(id = "default_id")
+            }
         }
         val action =
             SavedNewsFragmentDirections.actionSavedNewsFragmentToNewsArticleFragment(article)
