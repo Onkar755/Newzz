@@ -12,10 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.newzz.R
+import com.example.newzz.adapter.ExplorePagerAdapter
 import com.example.newzz.adapter.LoaderAdapter
 import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.adapter.OnItemClickListener
+import com.example.newzz.adapter.ViewPagerParentNavigator
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.FragmentSearchNewsBinding
 import com.example.newzz.db.ArticleDatabase
@@ -24,15 +27,18 @@ import com.example.newzz.repository.NewsRepository
 import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.viewmodel.NewsViewModel
 import com.example.newzz.viewmodel.NewsViewModelFactory
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SearchNewsFragment : Fragment(), OnItemClickListener {
+class SearchNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigator {
 
     private lateinit var binding: FragmentSearchNewsBinding
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var newsViewModel: NewsViewModel
+    private lateinit var explorePagerAdapter: ExplorePagerAdapter
+
     private var searchJob: Job? = null
     private val debouncePeriod: Long = 500
 
@@ -71,36 +77,78 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
             addItemDecoration(CustomDividerItemDecoration(requireContext(), marginStart, marginEnd))
         }
 
+        explorePagerAdapter = ExplorePagerAdapter(this)
+        binding.explorer.viewPager.adapter = explorePagerAdapter
+
+        TabLayoutMediator(binding.explorer.tabLayout, binding.explorer.viewPager) { tab, position ->
+            Log.d("TopNewsFragment", "Mediator $position")
+            tab.text = when (position) {
+                0 -> "Trending"
+                1 -> "Technology"
+                2 -> "Sports"
+                3 -> "Entertainment"
+                4 -> "Politics"
+                else -> null
+            }
+        }.attach()
+
         newsViewModel.searchedNews.observe(viewLifecycleOwner, Observer { articles ->
             Log.d("SearchNewsFragment", "Articles received: $articles")
             articles?.let {
-                Log.d("SearchNewsFragment", "Articles receiveddddd: $it")
+                Log.d("SearchNewsFragment", "Articles received: $it")
                 newsAdapter.submitData(lifecycle, it)
             }
+            binding.rvSearchNews.visibility = View.VISIBLE
+            binding.explorer.viewPager.visibility = View.GONE
+            binding.explorer.tabLayout.visibility = View.GONE
         })
-
 
         binding.searchView.setOnQueryTextListener(object :
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
-                    Log.d("SearchNewsFragment", "Call....")
-                    newsViewModel.getSearches(query)
-                    return true
+                query?.let {
+                    newsViewModel.getNews(query, "search")
+                    binding.rvSearchNews.visibility = View.VISIBLE
+                    binding.explorer.viewPager.visibility = View.GONE
+                    binding.explorer.tabLayout.visibility = View.GONE
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 searchJob?.cancel()
                 searchJob = lifecycleScope.launch {
+                    delay(debouncePeriod)
                     newText?.let { query ->
-                        delay(debouncePeriod)
-                        Log.d("SearchNewsFragment", "Call....")
-                        newsViewModel.getSearches(query)
+                        if (query.isNotEmpty()) {
+                            newsViewModel.getNews(query, "search")
+                        } else {
+                            // Show explorer if the query is empty
+                            binding.rvSearchNews.visibility = View.GONE
+                            binding.explorer.viewPager.visibility = View.VISIBLE
+                            binding.explorer.tabLayout.visibility = View.VISIBLE
+                            binding.searchView.clearFocus()
+                        }
                     }
                 }
-                return false
+                return true
+            }
+        })
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && binding.searchView.query.isNullOrEmpty()) {
+                binding.rvSearchNews.visibility = View.GONE
+                binding.explorer.viewPager.visibility = View.VISIBLE
+                binding.explorer.tabLayout.visibility = View.VISIBLE
+                binding.searchView.clearFocus()
+            }
+        }
+
+        binding.explorer.viewPager.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                binding.searchView.clearFocus() // Clear focus on page change
             }
         })
     }
@@ -121,5 +169,11 @@ class SearchNewsFragment : Fragment(), OnItemClickListener {
 
     override fun onSaveStateClick(article: Article) {
         newsViewModel.saveStateChange(article)
+    }
+
+    override fun navigateFromPager(article: Article) {
+        val action =
+            SearchNewsFragmentDirections.actionSearchNewsFragmentToNewsArticleFragment(article)
+        findNavController().navigate(action)
     }
 }

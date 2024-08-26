@@ -7,10 +7,14 @@ import androidx.room.Query
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.db.ArticleDAO
 import com.example.newzz.model.Article
+import com.example.newzz.util.ConnectivityObserver
+import com.example.newzz.util.NetworkChecker
+import kotlinx.coroutines.flow.first
 
 class TopNewsPagingSource(
     private val api: NewsAPI,
-    private val articleDAO: ArticleDAO
+    private val articleDAO: ArticleDAO,
+    private val networkChecker: NetworkChecker
 ) : PagingSource<Int, Article>() {
     override fun getRefreshKey(state: PagingState<Int, Article>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -22,11 +26,28 @@ class TopNewsPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         val page = params.key ?: 1
 
-        if (page == 1) {
-            articleDAO.deleteArticlesByCategory("top")
-        }
+        val isConnected = networkChecker.isNetworkAvailable()
+        Log.d(
+            "TopNewsPagingSource",
+            "Connectivity status: ${if (isConnected) "Available" else "Not Available"}"
+        )
 
         return try {
+
+            if (!isConnected) {
+                val articles = articleDAO.getTopArticles()
+                Log.d("TopNewsPagingSource", "DB Article -> Fetched $page articles: ${articles.size}")
+                return LoadResult.Page(
+                    data = articles,
+                    prevKey = if (page == 1) null else page - 1,
+                    nextKey = if (articles.isEmpty()) null else page + 1
+                )
+            }
+
+            if (page == 1) {
+                articleDAO.deleteArticlesByCategory("top")
+            }
+
             val response = api.getTopNews(page)
             val articles = response.body()?.articles?.filterNotNull() ?: emptyList()
 

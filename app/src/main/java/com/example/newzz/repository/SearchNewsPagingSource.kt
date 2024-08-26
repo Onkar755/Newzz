@@ -1,4 +1,4 @@
-package com.example.newzz.repository.paging
+package com.example.newzz.repository
 
 import android.util.Log
 import androidx.paging.PagingSource
@@ -9,8 +9,9 @@ import com.example.newzz.model.Article
 
 class SearchNewsPagingSource(
     private val query: String,
+    private val category: String,
     private val api: NewsAPI,
-    private val articleDAO: ArticleDAO
+    private val articleDAO: ArticleDAO,
 ) : PagingSource<Int, Article>() {
     override fun getRefreshKey(state: PagingState<Int, Article>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -22,7 +23,7 @@ class SearchNewsPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         val page = params.key ?: 1
         if (page == 1) {
-            articleDAO.deleteArticlesByCategory("searched")
+            articleDAO.deleteArticlesByCategory(category)
         }
         return try {
             val response = api.getSearchedNews(query, page)
@@ -36,9 +37,9 @@ class SearchNewsPagingSource(
 
             Log.d("TopNewsPagingSource", "Fetched $page articles: ${articles.size}")
 
-            val categorizedArticles = filteredArticles.map { it.copy(category = "searched") }
+            val categorizedArticles = filteredArticles.map { it.copy(category = category) }
 
-            val savedArticles = articleDAO.getSavedArticlesByCategorySync("searched")
+            val savedArticles = articleDAO.getSavedArticlesByCategorySync(category)
             val savedArticlesMap = savedArticles.associateBy { it.url }
 
             val updatedArticles = categorizedArticles.map {
