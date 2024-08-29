@@ -1,6 +1,7 @@
 package com.example.newzz.db
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -24,6 +25,9 @@ interface ArticleDAO {
 
     @Query("SELECT * FROM articles WHERE isSaved = 1")
     fun getSavedArticles(): LiveData<List<Article>>
+
+    @Query("SELECT * FROM articles WHERE category = :category")
+    fun getArticlesByCategory(category: String): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE category = 'trending'")
     suspend fun getTrendingArticles(): List<Article>

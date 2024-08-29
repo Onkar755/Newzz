@@ -3,7 +3,6 @@ package com.example.newzz.screens
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +10,13 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavArgs
 import androidx.navigation.fragment.navArgs
 import com.example.newzz.MainActivity
 import com.example.newzz.R
-import com.example.newzz.adapter.NewsAdapter
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.databinding.FragmentNewsArticleBinding
-import com.example.newzz.databinding.FragmentSavedNewsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
@@ -65,7 +62,7 @@ class NewsArticleFragment : Fragment() {
 
         binding.wvArticle.apply {
             binding.wvArticle.webViewClient = WebViewClient()
-            loadUrl(article.url.toString())
+            loadUrl(article.url)
             WebView.setWebContentsDebuggingEnabled(true)
             binding.wvArticle.settings.safeBrowsingEnabled = true
             binding.wvArticle.settings.allowFileAccess = false

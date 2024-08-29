@@ -16,14 +16,22 @@ class NewsRepository(
     private val articleDAO: ArticleDAO,
     private val networkChecker: NetworkChecker
 ) {
-    val isConnected = networkChecker.isNetworkAvailable()
+    private val isConnected = networkChecker.isNetworkAvailable()
 
     fun getSearches(query: String, category: String): Flow<PagingData<Article>> = Pager(
         config = PagingConfig(
             pageSize = 20,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { SearchNewsPagingSource(query, category, api, articleDAO) }
+        pagingSourceFactory = {
+            SearchNewsPagingSource(
+                query,
+                category,
+                api,
+                articleDAO,
+                networkChecker
+            )
+        }
     ).flow
 
     suspend fun getPopularNews(): List<Article> {

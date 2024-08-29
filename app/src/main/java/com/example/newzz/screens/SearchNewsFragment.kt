@@ -124,7 +124,6 @@ class SearchNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavig
                         if (query.isNotEmpty()) {
                             newsViewModel.getNews(query, "search")
                         } else {
-                            // Show explorer if the query is empty
                             binding.rvSearchNews.visibility = View.GONE
                             binding.explorer.viewPager.visibility = View.VISIBLE
                             binding.explorer.tabLayout.visibility = View.VISIBLE

@@ -11,9 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.example.newzz.R
 import com.example.newzz.adapter.ExplorePagerAdapter
 import com.example.newzz.adapter.NewsSliderAdapter
 import com.example.newzz.adapter.OnItemClickListener
@@ -57,7 +55,6 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
             ViewModelProvider(requireActivity(), newsViewModelFactory)[NewsViewModel::class.java]
         binding.topNews = newsViewModel
         isConnected = networkChecker.isNetworkAvailable()
-
         return binding.root
     }
 
@@ -92,8 +89,7 @@ class HomeNewsFragment : Fragment(), OnItemClickListener, ViewPagerParentNavigat
         }.attach()
 
         binding.srlTop.setOnRefreshListener {
-            newsViewModel.getPopularNews()
-
+            newsViewModel.refreshNews()
             binding.vpPopularToday.currentItem = 0
             stopAutoScroll()
             startAutoScroll()
