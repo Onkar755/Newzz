@@ -2,13 +2,12 @@ package com.example.newzz.screens.explore
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newzz.R
 import com.example.newzz.adapter.LoaderAdapter
@@ -20,7 +19,6 @@ import com.example.newzz.databinding.FragmentSportsBinding
 import com.example.newzz.db.ArticleDatabase
 import com.example.newzz.model.Article
 import com.example.newzz.repository.NewsRepository
-import com.example.newzz.screens.HomeNewsFragmentDirections
 import com.example.newzz.ui.CustomDividerItemDecoration
 import com.example.newzz.util.NetworkChecker
 import com.example.newzz.viewmodel.NewsViewModel
@@ -36,7 +34,7 @@ class SportsFragment : Fragment(), OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSportsBinding.inflate(inflater)
         binding.lifecycleOwner = this
         parentNavigator = parentFragment as ViewPagerParentNavigator

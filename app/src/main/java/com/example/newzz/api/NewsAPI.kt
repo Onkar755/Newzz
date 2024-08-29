@@ -11,20 +11,6 @@ import retrofit2.http.Query
 
 interface NewsAPI {
 
-    @GET("/v2/everything")
-    suspend fun getTopNews(
-        @Query("page")
-        page: Int = 1,
-        @Query("apiKey")
-        apiKey: String = API_KEY,
-        @Query("q")
-        q: String = "news",
-        @Query("language")
-        language: String = "en",
-        @Query("excludeDomains")
-        excludeDomains: String = "yahoo.com,removed.com,npr.org"
-    ): Response<NewsResponse>
-
     @GET("v2/everything")
     suspend fun getSearchedNews(
         @Query("q")

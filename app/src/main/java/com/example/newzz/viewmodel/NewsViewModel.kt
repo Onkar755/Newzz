@@ -45,7 +45,16 @@ class NewsViewModel(
     val popularNews: LiveData<List<Article>> = _popularNews
 
     init {
+        refreshNews()
+    }
+
+    fun refreshNews() {
         getPopularNews()
+        getNews("Films, Series, Entertainment", "entertainment")
+        getNews("politics", "politics")
+        getNews("sports", "sports")
+        getNews("Technology", "tech")
+        getNews("news", "trending")
     }
 
     val savedArticles: LiveData<List<Article>> = repository.getSavedArticles()
@@ -81,7 +90,7 @@ class NewsViewModel(
         }
     }
 
-    fun getPopularNews() {
+    private fun getPopularNews() {
         viewModelScope.launch {
             Log.d("NewsViewModel", "Calling Repo -> getPopularNews")
             val articles = repository.getPopularNews()

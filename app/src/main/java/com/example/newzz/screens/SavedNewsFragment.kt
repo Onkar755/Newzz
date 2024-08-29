@@ -41,7 +41,7 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
         val api = NewsAPI()
         val articleDAO = ArticleDatabase.invoke(requireContext()).getArticleDao()
         val networkChecker = NetworkChecker(requireContext())
-        val repository = NewsRepository(api, articleDAO,networkChecker)
+        val repository = NewsRepository(api, articleDAO, networkChecker)
         val newsViewModelFactory = NewsViewModelFactory(repository)
         newsViewModel =
             ViewModelProvider(requireActivity(), newsViewModelFactory)[NewsViewModel::class.java]
@@ -69,7 +69,17 @@ class SavedNewsFragment : Fragment(), OnItemClickListener {
 
         newsViewModel.savedArticles.observe(viewLifecycleOwner, Observer { articles ->
             Log.d("SavedNewsFragment", "Articles received: ${articles.size}")
-            newsAdapter.submitData(lifecycle, PagingData.from(articles))
+            if (articles.isEmpty()) {
+                binding.progress.visibility = View.GONE
+                binding.rvSavedNews.visibility = View.GONE
+                binding.noSavedItems.noResultStatus.text = "No Saved Articles!"
+                binding.noSavedItems.noResult.visibility = View.VISIBLE
+            } else {
+                newsAdapter.submitData(lifecycle, PagingData.from(articles))
+                binding.noSavedItems.noResult.visibility = View.GONE
+                binding.progress.visibility = View.GONE
+                binding.rvSavedNews.visibility = View.VISIBLE
+            }
         })
     }
 

@@ -5,4 +5,6 @@
     <color name="divider">#CCCCCC</color>
     <color name="colorPrimary">#4B7DDC</color>
     <color name="colorSecondary">#BBBBBB</color>
+    <color name="red">#D44B4B</color>
+    <color name="green">#4FC562</color>
 </resources>

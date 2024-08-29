@@ -6,12 +6,14 @@ import androidx.paging.PagingState
 import com.example.newzz.api.NewsAPI
 import com.example.newzz.db.ArticleDAO
 import com.example.newzz.model.Article
+import com.example.newzz.util.NetworkChecker
 
 class SearchNewsPagingSource(
     private val query: String,
     private val category: String,
     private val api: NewsAPI,
     private val articleDAO: ArticleDAO,
+    private val networkChecker: NetworkChecker
 ) : PagingSource<Int, Article>() {
     override fun getRefreshKey(state: PagingState<Int, Article>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -22,10 +24,30 @@ class SearchNewsPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
         val page = params.key ?: 1
-        if (page == 1) {
-            articleDAO.deleteArticlesByCategory(category)
-        }
+        val isConnected = networkChecker.isNetworkAvailable()
+        Log.d(
+            "SearchNewsPagingSource",
+            "Connectivity status: ${if (isConnected) "Available" else "Not Available"}"
+        )
+
         return try {
+
+            if (!isConnected) {
+                val articles = articleDAO.getSavedArticlesByCategorySync(category)
+                Log.d(
+                    "SearchNewsPagingSource",
+                    "DB Article -> Fetched $page articles: ${articles.size}"
+                )
+                return LoadResult.Page(
+                    data = articles,
+                    prevKey = null,
+                    nextKey = null
+                )
+            }
+
+            if (page == 1) {
+                articleDAO.deleteArticlesByCategory(category)
+            }
             val response = api.getSearchedNews(query, page)
             val articles = response.body()?.articles?.filterNotNull() ?: emptyList()
 
@@ -35,7 +57,7 @@ class SearchNewsPagingSource(
                 !urlsToExclude.contains(article.url)
             }
 
-            Log.d("SearchNewsPagingSource", "Fetched $page articles: ${articles.size}")
+            Log.d("SearchNewsPagingSource", "$category Fetched $page articles: ${articles.size}")
 
             val categorizedArticles = filteredArticles.map { it.copy(category = category) }
 

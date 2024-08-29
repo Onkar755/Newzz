@@ -1,7 +1,6 @@
 package com.example.newzz.adapter
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.newzz.screens.explore.EntertainmentFragment
 import com.example.newzz.screens.explore.PoliticsFragment
